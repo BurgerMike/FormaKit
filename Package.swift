@@ -10,7 +10,7 @@ import PackageDescription
 let package = Package(
     name: "FormaKit",
     platforms: [
-        .macOS(.v12),
+        .macOS(.v14),
         .iOS(.v15)
     ],
     products: [

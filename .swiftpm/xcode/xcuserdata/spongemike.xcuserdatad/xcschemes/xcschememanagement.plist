@@ -45,5 +45,48 @@
 			<integer>7</integer>
 		</dict>
 	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>FormaKit2D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FormaKit3D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FormaKitCoreGraphicsBridge</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FormaKitMetalBridge</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FormaKitPhysics</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FormaKitSceneKitBridge</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FormaKitSkeleton</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FormaKitTests</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
 </dict>
 </plist>
