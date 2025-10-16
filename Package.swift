@@ -3,9 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "FormaKit",
-    platforms: [
-        .macOS(.v14), .iOS(.v16)
-    ],
+    platforms: [.macOS(.v14), .iOS(.v16)],
     products: [
         .library(name: "FormaKit2D", targets: ["FormaKit2D"]),
         .library(name: "FormaKit3D", targets: ["FormaKit3D"]),
@@ -16,18 +14,8 @@ let package = Package(
         .library(name: "FormaKitCoreGraphicsBridge", targets: ["FormaKitCoreGraphicsBridge"]),
     ],
     targets: [
-        .target(name: "FormaKit2D",
-                swiftSettings: [
-                    .enableUpcomingFeature("StrictConcurrency"),
-                    .enableUpcomingFeature("InferSendableFromCaptures"),
-                    .enableUpcomingFeature("DisableOutwardActorInference"),
-                ]),
-        .target(name: "FormaKit3D",
-                swiftSettings: [
-                    .enableUpcomingFeature("StrictConcurrency"),
-                    .enableUpcomingFeature("InferSendableFromCaptures"),
-                    .enableUpcomingFeature("DisableOutwardActorInference"),
-                ]),
+        .target(name: "FormaKit2D"),
+        .target(name: "FormaKit3D", dependencies: ["FormaKit2D"]),          // ← 3D usa 2D
         .target(name: "FormaKitPhysics", dependencies: ["FormaKit3D"]),
         .target(name: "FormaKitSkeleton", dependencies: ["FormaKit3D"]),
         .target(name: "FormaKitMetalBridge", dependencies: ["FormaKit3D"]),

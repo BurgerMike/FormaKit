@@ -9,8 +9,7 @@
 import Foundation
 import FormaKit3D
 
-/// A basic rigid body simulation component.  Stores position, velocity and
-/// applies external forces to update motion via semi-implicit Euler integration.
+@MainActor // opcional pero útil si lo manejas desde UI/main
 public final class RigidBody<T: FloatingPoint> {
     public var position: Vector3<T>
     public var velocity: Vector3<T>
@@ -29,13 +28,10 @@ public final class RigidBody<T: FloatingPoint> {
         self.radius = radius
     }
 
-    /// Apply an external force that will be accumulated until the next call
-    /// to `integrate`.
     @inlinable public func applyForce(_ f: Vector3<T>) {
         forces = forces + f
     }
 
-    /// Integrate motion over a time step `dt` using semi-implicit Euler.
     @inlinable public func integrate(dt: T, gravity: Vector3<T> = .zero) {
         let acc = (forces / mass) + gravity
         velocity = velocity + acc * dt
@@ -43,8 +39,6 @@ public final class RigidBody<T: FloatingPoint> {
         forces = .zero
     }
 
-    /// Resolve a basic elastic sphere–sphere collision with another rigid body.
-    /// Coefficient of restitution is fixed at 0.6.
     @inlinable public func collideSphere(with other: inout RigidBody<T>) {
         let delta = other.position - position
         let dist = delta.length
@@ -52,25 +46,21 @@ public final class RigidBody<T: FloatingPoint> {
         guard dist != 0 && dist < minDist else { return }
         let n = delta / dist
         let penetration = minDist - dist
-        let invMass1 = T(1) / mass
-        let invMass2 = T(1) / other.mass
-        let totalInv = invMass1 + invMass2
-        // positional correction
-        position = position - n * (penetration * (invMass1 / totalInv))
-        other.position = other.position + n * (penetration * (invMass2 / totalInv))
-        // impulse
+        let inv1 = T(1) / mass
+        let inv2 = T(1) / other.mass
+        let totalInv = inv1 + inv2
+        position      = position      - n * (penetration * (inv1 / totalInv))
+        other.position = other.position + n * (penetration * (inv2 / totalInv))
         let relative = other.velocity - velocity
         let vn = relative.dot(n)
         if vn < 0 {
             let restitution: T = T(3) / T(5)
             let j = -(T(1) + restitution) * vn / totalInv
             let impulse = n * j
-            velocity = velocity - impulse * invMass1
-            other.velocity = other.velocity + impulse * invMass2
+            velocity      = velocity      - impulse * inv1
+            other.velocity = other.velocity + impulse * inv2
         }
     }
 }
 
-/// Swift 6: `Sendable` solo cuando `T` lo sea (Double/Float/CGFloat ya lo son).
 extension RigidBody: Sendable where T: Sendable {}
-

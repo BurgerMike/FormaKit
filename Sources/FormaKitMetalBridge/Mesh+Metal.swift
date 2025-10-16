@@ -18,6 +18,21 @@ public struct MetalMeshBuffers {
     public let ib:          MTLBuffer
     public let indexCount:  Int
     public let indexType:   MTLIndexType
+
+    // ✅ Init explícito con los mismos labels que usas al crear la instancia.
+    public init(vbPositions: MTLBuffer,
+                vbNormals: MTLBuffer?,
+                vbUVs: MTLBuffer?,
+                ib: MTLBuffer,
+                indexCount: Int,
+                indexType: MTLIndexType) {
+        self.vbPositions = vbPositions
+        self.vbNormals   = vbNormals
+        self.vbUVs       = vbUVs
+        self.ib          = ib
+        self.indexCount  = indexCount
+        self.indexType   = indexType
+    }
 }
 
 /// Convenience vertex descriptor matching the buffer layout we create:
@@ -55,12 +70,12 @@ public func makeStandardVertexDescriptor(hasNormals: Bool, hasUVs: Bool) -> MTLV
 
 @inlinable
 public func makeMetalBuffers(device: MTLDevice, mesh: Mesh<Double>) -> MetalMeshBuffers {
-    return _makeMetalBuffers(device: device, mesh: mesh) { Float($0) }
+    _makeMetalBuffers(device: device, mesh: mesh) { Float($0) }
 }
 
 @inlinable
 public func makeMetalBuffers(device: MTLDevice, mesh: Mesh<Float>) -> MetalMeshBuffers {
-    return _makeMetalBuffers(device: device, mesh: mesh) { $0 }
+    _makeMetalBuffers(device: device, mesh: mesh) { $0 }
 }
 
 // MARK: - Generic core (internal)

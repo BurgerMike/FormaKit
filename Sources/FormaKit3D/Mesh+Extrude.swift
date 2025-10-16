@@ -4,6 +4,7 @@
 import Foundation
 import FormaKit2D
 
+
 public extension Mesh where T == Double {
     /// Extrude a 2D shape into a 3D prism of the specified height (Y up).
     static func extrude<S: Shape>(_ shape: S, height: Double) -> Mesh where S.Scalar == Double {
