@@ -1,13 +1,10 @@
 //  FormaKit
 //  Vector2.swift
-//
-//  Created by FormaKit authors.  Provides a generic 2D vector type with
-//  basic arithmetic operations.  This file is part of the FormaKit2D target.
 
 import Foundation
 
-/// A two‑component vector.  Generic over the underlying floating point type.
-public struct Vector2<T: FloatingPoint>: Equatable, Sendable {
+/// A two-component vector. Generic over the underlying floating point type.
+public struct Vector2<T: FloatingPoint>: Equatable {
     public var x: T
     public var y: T
 
@@ -36,6 +33,7 @@ public struct Vector2<T: FloatingPoint>: Equatable, Sendable {
     @inlinable public static func /(lhs: Vector2, rhs: T) -> Vector2 {
         Vector2(lhs.x / rhs, lhs.y / rhs)
     }
+
     @inlinable public mutating func add(_ other: Vector2) {
         self.x += other.x; self.y += other.y
     }
@@ -48,18 +46,21 @@ public struct Vector2<T: FloatingPoint>: Equatable, Sendable {
 
     /// Dot (scalar) product.
     @inlinable public func dot(_ other: Vector2) -> T {
-        return x * other.x + y * other.y
+        x * other.x + y * other.y
     }
 
     /// Length (magnitude) of the vector.
     @inlinable public var length: T {
-        return (x * x + y * y).squareRoot()
+        (x * x + y * y).squareRoot()
     }
 
-    /// Returns a normalized copy of this vector.  If the vector is zero length,
-    /// returns the zero vector.
+    /// Normalized copy (zero if length is 0).
     @inlinable public func normalized() -> Vector2 {
-        let len = self.length
+        let len = length
         return len > 0 ? self / len : .zero
     }
 }
+
+/// Swift 6: Sendable solo cuando T lo sea (evita el error de concurrencia).
+extension Vector2: Sendable where T: Sendable {}
+

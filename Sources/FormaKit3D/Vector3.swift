@@ -1,14 +1,10 @@
 //  FormaKit
 //  Vector3.swift
-//
-//  Created by FormaKit authors.  Provides a generic 3D vector type with
-//  basic arithmetic operations and common vector math.  This file is part of
-//  the FormaKit3D target.
 
 import Foundation
 
-/// A three‑component vector.  Generic over the underlying floating point type.
-public struct Vector3<T: FloatingPoint>: Equatable, Sendable {
+/// A three-component vector. Generic over the underlying floating point type.
+public struct Vector3<T: FloatingPoint>: Equatable {
     public var x: T
     public var y: T
     public var z: T
@@ -42,12 +38,12 @@ public struct Vector3<T: FloatingPoint>: Equatable, Sendable {
 
     /// Dot (scalar) product.
     @inlinable public func dot(_ other: Vector3) -> T {
-        return x * other.x + y * other.y + z * other.z
+        x * other.x + y * other.y + z * other.z
     }
 
     /// Cross (vector) product.
     @inlinable public func cross(_ other: Vector3) -> Vector3 {
-        return Vector3(
+        Vector3(
             y * other.z - z * other.y,
             z * other.x - x * other.z,
             x * other.y - y * other.x
@@ -56,13 +52,16 @@ public struct Vector3<T: FloatingPoint>: Equatable, Sendable {
 
     /// Length (magnitude) of the vector.
     @inlinable public var length: T {
-        return (x * x + y * y + z * z).squareRoot()
+        (x * x + y * y + z * z).squareRoot()
     }
 
-    /// Returns a normalized copy of this vector.  If the vector is zero length,
-    /// returns the zero vector.
+    /// Returns a normalized copy of this vector; returns .zero if length == 0.
     @inlinable public func normalized() -> Vector3 {
-        let len = self.length
+        let len = length
         return len > 0 ? self / len : .zero
     }
 }
+
+/// Swift 6: Sendable solo cuando T lo sea.
+extension Vector3: Sendable where T: Sendable {}
+

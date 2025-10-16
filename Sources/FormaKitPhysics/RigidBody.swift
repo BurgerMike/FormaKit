@@ -10,8 +10,8 @@ import Foundation
 import FormaKit3D
 
 /// A basic rigid body simulation component.  Stores position, velocity and
-/// applies external forces to update motion via semi‑implicit Euler integration.
-public final class RigidBody<T: FloatingPoint>: Sendable {
+/// applies external forces to update motion via semi-implicit Euler integration.
+public final class RigidBody<T: FloatingPoint> {
     public var position: Vector3<T>
     public var velocity: Vector3<T>
     public var mass: T
@@ -35,7 +35,7 @@ public final class RigidBody<T: FloatingPoint>: Sendable {
         forces = forces + f
     }
 
-    /// Integrate motion over a time step `dt` using semi‑implicit Euler.
+    /// Integrate motion over a time step `dt` using semi-implicit Euler.
     @inlinable public func integrate(dt: T, gravity: Vector3<T> = .zero) {
         let acc = (forces / mass) + gravity
         velocity = velocity + acc * dt
@@ -70,3 +70,7 @@ public final class RigidBody<T: FloatingPoint>: Sendable {
         }
     }
 }
+
+/// Swift 6: `Sendable` solo cuando `T` lo sea (Double/Float/CGFloat ya lo son).
+extension RigidBody: Sendable where T: Sendable {}
+

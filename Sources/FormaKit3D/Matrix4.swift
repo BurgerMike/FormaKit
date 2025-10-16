@@ -1,28 +1,19 @@
 //  FormaKit
 //  Matrix4.swift
-//
-//  A simple 4×4 matrix type for affine transformations in 3D.  The matrix is
-//  stored in column‑major order to match Metal/SceneKit/GL conventions.  It
-//  includes factory methods for identity, translation, scale and rotation as
-//  well as multiplication.  This file is part of the FormaKit3D target.
 
 import Foundation
-
 #if canImport(Darwin)
 import Darwin
 #else
 import Glibc
 #endif
 
-/// A 4×4 matrix representing an affine transformation.  Generic over the
-/// underlying floating point scalar.
-public struct Matrix4<T: BinaryFloatingPoint>: Equatable, Sendable {
-    /// The elements of the matrix in column‑major order.  `m[0]..m[3]` form
-    /// the first column, `m[4]..m[7]` the second, etc.
+/// A 4×4 matrix representing an affine transformation. Generic over the scalar.
+public struct Matrix4<T: BinaryFloatingPoint>: Equatable {
+    /// Column-major storage (m[0...3] first column, etc.)
     public var m: [T]
 
-    /// Create a matrix from an array of 16 elements.  The array is used
-    /// directly; no copying is performed.
+    /// Create a matrix from 16 elements (no copying).
     @inlinable public init(_ m: [T]) {
         precondition(m.count == 16)
         self.m = m
@@ -30,7 +21,7 @@ public struct Matrix4<T: BinaryFloatingPoint>: Equatable, Sendable {
 
     /// Identity matrix.
     @inlinable public static var identity: Matrix4 {
-        return Matrix4([
+        Matrix4([
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
@@ -38,9 +29,9 @@ public struct Matrix4<T: BinaryFloatingPoint>: Equatable, Sendable {
         ])
     }
 
-    /// Create a translation matrix.
+    /// Translation.
     @inlinable public static func translation(_ t: Vector3<T>) -> Matrix4 {
-        return Matrix4([
+        Matrix4([
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
@@ -48,9 +39,9 @@ public struct Matrix4<T: BinaryFloatingPoint>: Equatable, Sendable {
         ])
     }
 
-    /// Create a scale matrix.
+    /// Scale.
     @inlinable public static func scale(_ s: Vector3<T>) -> Matrix4 {
-        return Matrix4([
+        Matrix4([
             s.x, 0,   0,   0,
             0,   s.y, 0,   0,
             0,   0,   s.z, 0,
@@ -58,7 +49,7 @@ public struct Matrix4<T: BinaryFloatingPoint>: Equatable, Sendable {
         ])
     }
 
-    /// Create a rotation matrix about an axis by an angle in radians.
+    /// Rotation about axis by angle (radians).
     @inlinable public static func rotation(axis: Vector3<T>, angleRadians: T) -> Matrix4 {
         let n = axis.normalized()
         let x = n.x, y = n.y, z = n.z
@@ -80,7 +71,7 @@ public struct Matrix4<T: BinaryFloatingPoint>: Equatable, Sendable {
             for col in 0..<4 {
                 var sum: T = 0
                 for k in 0..<4 {
-                    let a = lhs.m[k*4 + row]   // column‑major: lhs[k][row]
+                    let a = lhs.m[k*4 + row]   // column-major: lhs[k][row]
                     let b = rhs.m[col*4 + k]   // rhs[col][k]
                     sum += a * b
                 }
@@ -90,8 +81,7 @@ public struct Matrix4<T: BinaryFloatingPoint>: Equatable, Sendable {
         return Matrix4(out)
     }
 
-    /// Transform a point by this matrix.  Treats the point as having a
-    /// homogeneous coordinate of 1.
+    /// Transform a point (homogeneous w = 1).
     @inlinable public func transformPoint(_ p: Vector3<T>) -> Vector3<T> {
         let x = p.x, y = p.y, z = p.z
         let m = self.m
@@ -99,11 +89,10 @@ public struct Matrix4<T: BinaryFloatingPoint>: Equatable, Sendable {
         let ty = m[1]*x + m[5]*y + m[9]*z  + m[13]
         let tz = m[2]*x + m[6]*y + m[10]*z + m[14]
         let w  = m[3]*x + m[7]*y + m[11]*z + m[15]
-        if w != 0 { return Vector3(tx/w, ty/w, tz/w) }
-        return Vector3(tx, ty, tz)
+        return w != 0 ? Vector3(tx/w, ty/w, tz/w) : Vector3(tx, ty, tz)
     }
 
-    /// Transform a direction vector by this matrix.  Ignores translation.
+    /// Transform a direction (ignores translation).
     @inlinable public func transformDirection(_ d: Vector3<T>) -> Vector3<T> {
         let x = d.x, y = d.y, z = d.z
         let m = self.m
@@ -114,3 +103,7 @@ public struct Matrix4<T: BinaryFloatingPoint>: Equatable, Sendable {
         )
     }
 }
+
+/// Swift 6: Sendable solo cuando T lo sea (y el array de elementos también).
+extension Matrix4: Sendable where T: Sendable {}
+

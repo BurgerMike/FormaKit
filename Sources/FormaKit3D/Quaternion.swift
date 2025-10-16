@@ -1,38 +1,29 @@
 //  FormaKit
 //  Quaternion.swift
-//
-//  Basic quaternion math for representing 3D rotations.  The quaternion is
-//  represented as (x, y, z, w) where w is the scalar part.  Provides
-//  operations for multiplication, normalization, and conversion to/from
-//  axis‑angle.  This file is part of the FormaKit3D target.
-
 
 import Foundation
-
 #if canImport(Darwin)
 import Darwin
 #else
 import Glibc
 #endif
 
-/// A quaternion representing a 3D rotation.  Generic over the floating point
-/// scalar type.  Quaternions are typically normalized to represent pure
-/// rotations.
-public struct Quaternion<T: BinaryFloatingPoint>: Equatable, Sendable {
+/// A quaternion representing a 3D rotation. Generic over the floating point scalar.
+public struct Quaternion<T: BinaryFloatingPoint>: Equatable {
     public var x: T
     public var y: T
     public var z: T
     public var w: T
 
-    /// Create a quaternion from components.  Use normalized() if needed.
+    /// Create a quaternion from components. Use normalized() if needed.
     @inlinable public init(x: T, y: T, z: T, w: T) {
         self.x = x; self.y = y; self.z = z; self.w = w
     }
 
-    /// The identity quaternion (no rotation).
+    /// Identity quaternion (no rotation).
     @inlinable public static var identity: Quaternion { Quaternion(x: 0, y: 0, z: 0, w: 1) }
 
-    /// Create a quaternion from an axis and angle in radians.
+    /// From axis + angle (radians).
     @inlinable public static func fromAxis(_ axis: Vector3<T>, angleRadians: T) -> Quaternion {
         let n = axis.normalized()
         let half = angleRadians / 2
@@ -40,9 +31,9 @@ public struct Quaternion<T: BinaryFloatingPoint>: Equatable, Sendable {
         return Quaternion(x: n.x * s, y: n.y * s, z: n.z * s, w: T(cos(Double(half))))
     }
 
-    /// Multiply two quaternions (composition of rotations).  Note: not commutative.
+    /// Composition (not commutative).
     @inlinable public static func *(lhs: Quaternion, rhs: Quaternion) -> Quaternion {
-        return Quaternion(
+        Quaternion(
             x: lhs.w*rhs.x + lhs.x*rhs.w + lhs.y*rhs.z - lhs.z*rhs.y,
             y: lhs.w*rhs.y - lhs.x*rhs.z + lhs.y*rhs.w + lhs.z*rhs.x,
             z: lhs.w*rhs.z + lhs.x*rhs.y - lhs.y*rhs.x + lhs.z*rhs.w,
@@ -50,16 +41,15 @@ public struct Quaternion<T: BinaryFloatingPoint>: Equatable, Sendable {
         )
     }
 
-    /// Normalize the quaternion.  If length is zero, returns the identity.
+    /// Normalized (identity if zero).
     @inlinable public func normalized() -> Quaternion {
         let len = (x*x + y*y + z*z + w*w).squareRoot()
         return len > 0 ? Quaternion(x: x/len, y: y/len, z: z/len, w: w/len) : .identity
     }
 
-    /// Convert this quaternion into a 4×4 rotation matrix.  The matrix is
-    /// column‑major.
+    /// Convert to column-major 4×4 rotation matrix.
     @inlinable public func toMatrix() -> Matrix4<T> {
-        let q = self.normalized()
+        let q = normalized()
         let x = q.x, y = q.y, z = q.z, w = q.w
         let xx = x * x, yy = y * y, zz = z * z
         let xy = x * y, xz = x * z, yz = y * z
@@ -72,3 +62,7 @@ public struct Quaternion<T: BinaryFloatingPoint>: Equatable, Sendable {
         ])
     }
 }
+
+/// Swift 6: Sendable solo cuando T lo sea.
+extension Quaternion: Sendable where T: Sendable {}
+
